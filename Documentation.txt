@@ -1,0 +1,6 @@
+Libraries installed using zipped folder method 
+
+1. Arduino_JSON 
+https://github.com/arduino-libraries/Arduino_JSON
+
+2. 
