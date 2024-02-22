@@ -13,18 +13,59 @@ const char* ssid = "REPLACE_WITH_YOUR_SSID";
 const char* password = "REPLACE_WITH_YOUR_PASSWORD";
 
 
+//station credentials 
+const char* ssAP = "ESP32-Access-Point" ; 
+const char* passwordAP = "123456789" ; 
+
+
+//Wifi channel for access point 
+#define CHAN_AP 2 
+
+//message type for the web server client 
 typedef struct struct_message {
   int id;
   int toggle_on ; 
 } struct_message;
 
-
 struct_message incomingCircuitOnMessage ; 
+
+//change the following to the recivers' MAC address (obtain them by running WiFi.macAddress() in the slave boards)
+uint8_t broadcastAddress1[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+uint8_t broadcastAddress2[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+
+
+typedef struct broadcast_message_struct {
+  int start  ;  
+  int end  ; 
+  int time ; 
+  int color ; 
+} broadcast_message_struct;
+
+broadcast_message_struct broadcast_message ; 
+
+esp_now_peer_info_t peerInfo;
+
 
 JSONVar board;
 
 AsyncWebServer server(80);
 AsyncEventSource events("/events");
+
+
+
+//this callback function will be triggerd when the data is broadcastd to the slaves 
+
+void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
+  char macStr[18];
+  Serial.print("Packet to: ");
+  // Copies the sender mac address to a string
+  snprintf(macStr, sizeof(macStr), "%02x:%02x:%02x:%02x:%02x:%02x",
+           mac_addr[0], mac_addr[1], mac_addr[2], mac_addr[3], mac_addr[4], mac_addr[5]);
+  Serial.print(macStr);
+  Serial.print(" send status:\t");
+  Serial.println(status == ESP_NOW_SEND_SUCCESS ? "Delivery Success" : "Delivery Fail");
+}
+
 
 
 //This callback function will be triggered when the webpage client makes request to the webserver 
@@ -84,16 +125,47 @@ void setup(){
   Serial.print("ESP Board MAC Address: "); 
   Serial.println(WiFi.macAddress()) ; //printing the mac address if needed 
 
- 
+
+  //Setting the access point 
+
+  WiFi.softAP(ssAP , passwordAP) ; 
+
+
+   // Print the IP address of the AP
+  Serial.print("AP IP address: ");
+  Serial.println(WiFi.softAPIP());
+
   // Init ESP-NOW
   if (esp_now_init() != ESP_OK) {
     Serial.println("Error initializing ESP-NOW");
     return;
   }
+
+  esp_now_register_send_cb(OnDataSent);
   
   // Once ESPNow is successfully Init, we will register for recv CB to
   // get recv packer info
   esp_now_register_recv_cb(OnDataRecv);
+
+
+  //ESPNOW adding the slave peers 
+
+   // register peer
+  peerInfo.channel = 0;  
+  peerInfo.encrypt = false;
+  // register first peer  
+  memcpy(peerInfo.peer_addr, broadcastAddress1, 2);
+  if (esp_now_add_peer(&peerInfo) != ESP_OK){
+    Serial.println("Failed to add peer");
+    return;
+  }
+  // register second peer  
+  memcpy(peerInfo.peer_addr, broadcastAddress2, 2);
+  if (esp_now_add_peer(&peerInfo) != ESP_OK){
+    Serial.println("Failed to add peer");
+    return;
+  }
+
 
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send_P(200, "text/html", index_html);
@@ -119,6 +191,21 @@ void loop(){
     events.send("ping",NULL,millis());
     lastEventTime = millis();
   }
+
+  broadcast_message.start = random(0,20);
+  broadcast_message.end = random(0,20);
+  broadcast_message.color = random(0,20);
+  broadcast_message.time = random(0,20);
+ 
+  esp_err_t result = esp_now_send(0, (uint8_t *) &broadcast_message, sizeof(broadcast_message_struct));
+   
+  if (result == ESP_OK) {
+    Serial.println("Sent with success");
+  }
+  else {
+    Serial.println("Error sending the data");
+  }
+  delay(2000);
 }
 
 
