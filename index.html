@@ -47,6 +47,33 @@
             btn.innerHTML = (btn.innerHTML === "On") ? "Off" : "On" ; 
             display.innerHTML = (display.innerHTML === "LED suit is off right now") ? "LED suit is on right now" : "LED suit is off right now";
         }
+
+        
+        // WebSocket connection to the ESP-NOW web server
+        const socket = new WebSocket('ws://your_esp32_ip_address/events');
+
+        // Event listener for when the WebSocket connection is open
+        socket.addEventListener('open', (event) => {
+        console.log('WebSocket connection opened');
+        });
+
+        // Event listener for when a message is received from the server
+        socket.addEventListener('message', (event) => {
+        console.log('Message from server:', event.data);
+        // You can handle the received message here if needed
+        });
+
+        // Event listener for when the WebSocket connection is closed
+        socket.addEventListener('close', (event) => {
+        console.log('WebSocket connection closed');
+        });
+
+        // Function to send a message to the ESP-NOW web server
+        function sendMessage() {
+        // Send a custom message (you can customize the message format)
+        const message = { id: 1, toggle_on: 1 }; // Customize the message content
+        socket.send(JSON.stringify(message));
+        }
     </script>
     </body> 
 </html>

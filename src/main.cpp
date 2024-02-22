@@ -6,7 +6,7 @@
 #include <WiFi.h>
 #include "ESPAsyncWebServer.h"
 #include <Arduino_JSON.h>
-
+#include <FastLED.h>
 
 // Replace with your network credentials (WIFI-STATION)
 const char* ssid = "REPLACE_WITH_YOUR_SSID";
@@ -50,6 +50,14 @@ JSONVar board;
 
 AsyncWebServer server(80);
 AsyncEventSource events("/events");
+
+
+//FastLED setup 
+
+#define NUM_LEDS  18
+#define LED_PIN   2
+
+CRGB leds[NUM_LEDS];
 
 
 
@@ -182,16 +190,13 @@ void setup(){
   server.addHandler(&events);
   server.begin();
 
+
+  //FastLED setup 
+  FastLED.addLeds<WS2812B, LED_PIN, GRB>(leds, NUM_LEDS);
+  FastLED.setBrightness(100);
+
 }
-
-void loop(){
-  static unsigned long lastEventTime = millis();
-  static const unsigned long EVENT_INTERVAL_MS = 5000;
-  if ((millis() - lastEventTime) > EVENT_INTERVAL_MS) {
-    events.send("ping",NULL,millis());
-    lastEventTime = millis();
-  }
-
+void broadcast(){
   broadcast_message.start = random(0,20);
   broadcast_message.end = random(0,20);
   broadcast_message.color = random(0,20);
@@ -205,7 +210,23 @@ void loop(){
   else {
     Serial.println("Error sending the data");
   }
-  delay(2000);
+}
+void loop(){
+  static unsigned long lastEventTime = millis();
+  static const unsigned long EVENT_INTERVAL_MS = 5000;
+  if ((millis() - lastEventTime) > EVENT_INTERVAL_MS) {
+    events.send("ping",NULL,millis());
+    lastEventTime = millis();
+  }
+
+  delay(500) ; 
+  leds[0] = CRGB::Blue ; 
+  FastLED.show() ; 
+  delay(500) ; 
+  FastLED.clear() ; 
+  FastLED.show() ; 
+  broadcast() ; 
+  
 }
 
 
