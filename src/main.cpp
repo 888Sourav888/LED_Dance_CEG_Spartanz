@@ -1,233 +1,179 @@
-//this file is responsible for having the code for the lead dancer
-// the esp32 of this dancer will act as both master in the ESP-Now protocol
-// as well as a web server that will be getting HTTP requests from the client to turn on or off
-
-#include <esp_now.h>
+// Import required libraries
 #include <WiFi.h>
-#include "ESPAsyncWebServer.h"
-#include <Arduino_JSON.h>
+#include <AsyncTCP.h>
+#include <ESPAsyncWebServer.h>
 #include <FastLED.h>
 
-// Replace with your network credentials (WIFI-STATION)
+
+// Replace with your network credentials
 const char* ssid = "REPLACE_WITH_YOUR_SSID";
 const char* password = "REPLACE_WITH_YOUR_PASSWORD";
 
+bool ledState = 0;
+const int ledPin = 2;
 
-//station credentials 
-const char* ssAP = "ESP32-Access-Point" ; 
-const char* passwordAP = "123456789" ; 
-
-
-//Wifi channel for access point 
-#define CHAN_AP 2 
-
-//message type for the web server client 
-typedef struct struct_message {
-  int id;
-  int toggle_on ; 
-} struct_message;
-
-struct_message incomingCircuitOnMessage ; 
-
-//change the following to the recivers' MAC address (obtain them by running WiFi.macAddress() in the slave boards)
-uint8_t broadcastAddress1[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
-uint8_t broadcastAddress2[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
-
-
-typedef struct broadcast_message_struct {
-  int start  ;  
-  int end  ; 
-  int time ; 
-  int color ; 
-} broadcast_message_struct;
-
-broadcast_message_struct broadcast_message ; 
-
-esp_now_peer_info_t peerInfo;
-
-
-JSONVar board;
-
+// Create AsyncWebServer object on port 80
 AsyncWebServer server(80);
-AsyncEventSource events("/events");
+AsyncWebSocket ws("/ws");
+
+const char index_html[] PROGMEM = R"rawliteral(
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>ESP32 WebSocket Server</title>
+    <style>
+    html{font-family: Helvetica; display: inline-block; margin: 0px auto; text-align: center;}
+    body{margin-top: 50px;}
+    h1{color: #444444;margin: 50px auto;}
+    p{font-size: 19px;color: #888;}
+    #state{font-weight: bold;color: #444;}
+    .switch{margin:25px auto;width:80px}
+    .toggle{display:none}
+    .toggle+label{display:block;position:relative;cursor:pointer;outline:0;user-select:none;padding:2px;width:80px;height:40px;background-color:#ddd;border-radius:40px}
+    .toggle+label:before,.toggle+label:after{display:block;position:absolute;top:1px;left:1px;bottom:1px;content:""}
+    .toggle+label:before{right:1px;background-color:#f1f1f1;border-radius:40px;transition:background .4s}
+    .toggle+label:after{width:40px;background-color:#fff;border-radius:20px;box-shadow:0 2px 5px rgba(0,0,0,.3);transition:margin .4s}
+    .toggle:checked+label:before{background-color:#4285f4}
+    .toggle:checked+label:after{margin-left:42px}
+    </style>
+  </head>
+  <body>
+    <h1>ESP32 WebSocket Server</h1>
+    <div class="switch">
+      <input id="toggle-btn" class="toggle" type="checkbox" %CHECK%>
+      <label for="toggle-btn"></label>
+    </div>
+    <p>On-board LED: <span id="state">%STATE%</span></p>
+
+    <script>
+	  window.addEventListener('load', function() {
+		var websocket = new WebSocket(`ws://${window.location.hostname}/ws`);
+		websocket.onopen = function(event) {
+		  console.log('Connection established');
+		}
+		websocket.onclose = function(event) {
+		  console.log('Connection died');
+		}
+		websocket.onerror = function(error) {
+		  console.log('error');
+		};
+		websocket.onmessage = function(event) {
+		  if (event.data == "1") {
+			document.getElementById('state').innerHTML = "ON";
+			document.getElementById('toggle-btn').checked = true;
+		  }
+		  else {
+			document.getElementById('state').innerHTML = "OFF";
+			document.getElementById('toggle-btn').checked = false;
+		  }
+		};
+		
+		document.getElementById('toggle-btn').addEventListener('change', function() { websocket.send('toggle'); });
+	  });
+	</script>
+  </body>
+</html>
+)rawliteral";
+
+void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
+  AwsFrameInfo *info = (AwsFrameInfo*)arg;
+  if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT) {
+    data[len] = 0;
+    if (strcmp((char*)data, "toggle") == 0) {
+      ledState = !ledState;
+      ws.textAll(String(ledState));
+    }
+  }
+}
+
+void eventHandler(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len) {
+  switch (type) {
+    case WS_EVT_CONNECT:
+      Serial.printf("WebSocket client #%u connected from %s\n", client->id(), client->remoteIP().toString().c_str());
+      break;
+    case WS_EVT_DISCONNECT:
+      Serial.printf("WebSocket client #%u disconnected\n", client->id());
+      break;
+    case WS_EVT_DATA:
+      handleWebSocketMessage(arg, data, len);
+      //digitalWrite(ledPin, ledState);
+      break;
+    case WS_EVT_PONG:
+    case WS_EVT_ERROR:
+      break;
+  }
+}
+
+String processor(const String& var){
+  if(var == "STATE"){
+      return ledState ? "ON" : "OFF";
+  }
+  if(var == "CHECK"){
+    return ledState ? "checked" : "";
+  }
+  return String();
+}
 
 
-//FastLED setup 
+// //FastLED setup 
 
 #define NUM_LEDS  18
 #define LED_PIN   2
 
 CRGB leds[NUM_LEDS];
 
-
-
-//this callback function will be triggerd when the data is broadcastd to the slaves 
-
-void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
-  char macStr[18];
-  Serial.print("Packet to: ");
-  // Copies the sender mac address to a string
-  snprintf(macStr, sizeof(macStr), "%02x:%02x:%02x:%02x:%02x:%02x",
-           mac_addr[0], mac_addr[1], mac_addr[2], mac_addr[3], mac_addr[4], mac_addr[5]);
-  Serial.print(macStr);
-  Serial.print(" send status:\t");
-  Serial.println(status == ESP_NOW_SEND_SUCCESS ? "Delivery Success" : "Delivery Fail");
-}
-
-
-
-//This callback function will be triggered when the webpage client makes request to the webserver 
-void OnDataRecv(const uint8_t * mac_addr, const uint8_t *incomingData, int len) { 
-  // Copies the sender mac address to a string
-  char macStr[18];
-  Serial.print("Packet received from: ");
-  snprintf(macStr, sizeof(macStr), "%02x:%02x:%02x:%02x:%02x:%02x",
-           mac_addr[0], mac_addr[1], mac_addr[2], mac_addr[3], mac_addr[4], mac_addr[5]);
-  Serial.println(macStr);
-  memcpy(&incomingCircuitOnMessage, incomingData, sizeof(incomingCircuitOnMessage));
-  
-
-
-    board["id"] = incomingCircuitOnMessage.id ; 
-    board["turnOn"] = incomingCircuitOnMessage.toggle_on ; 
-  String jsonString = JSON.stringify(board);
-  events.send(jsonString.c_str(), "new_readings", millis());
-  
-  Serial.printf("Board ID %u: %u bytes\n", incomingCircuitOnMessage.id, len);
-  Serial.printf("Spartanz member wants the circuit to be on ? (0/1):" , incomingCircuitOnMessage.toggle_on) ; 
-  Serial.println();
-}
-
-
-const char index_html[] PROGMEM = R"rawliteral(
-<!DOCTYPE HTML><html>
-<head>
-   html code for the webpage must be added here 
-  </style>
-</head>
-<body>
- 
-</body>
-</html>)rawliteral";
-
-
-
 void setup(){
-
-    // Initialize Serial Monitor
+  // Serial port for debugging purposes
   Serial.begin(115200);
 
-  // Set the device as a Station and Soft Access Point simultaneously
-  WiFi.mode(WIFI_AP_STA);
+  // pinMode(ledPin, OUTPUT);
+  // digitalWrite(ledPin, LOW);
+
+  Serial.print("Connecting to ");
+  Serial.println(ssid);
   
-  // Set device as a Wi-Fi Station
+  // Connect to Wi-Fi
   WiFi.begin(ssid, password);
+  
   while (WiFi.status() != WL_CONNECTED) {
     delay(1000);
-    Serial.println("Setting as a Wi-Fi Station..");
+    Serial.print(".");
   }
-  Serial.print("Station IP Address: ");
-  Serial.println(WiFi.localIP());
-  Serial.print("Wi-Fi Channel: ");
-  Serial.println(WiFi.channel());
-  Serial.print("ESP Board MAC Address: "); 
-  Serial.println(WiFi.macAddress()) ; //printing the mac address if needed 
-
-
-  //Setting the access point 
-
-  WiFi.softAP(ssAP , passwordAP) ; 
-
-
-   // Print the IP address of the AP
-  Serial.print("AP IP address: ");
-  Serial.println(WiFi.softAPIP());
-
-  // Init ESP-NOW
-  if (esp_now_init() != ESP_OK) {
-    Serial.println("Error initializing ESP-NOW");
-    return;
-  }
-
-  esp_now_register_send_cb(OnDataSent);
   
-  // Once ESPNow is successfully Init, we will register for recv CB to
-  // get recv packer info
-  esp_now_register_recv_cb(OnDataRecv);
+  Serial.println("");
+  Serial.println("Connected..!");
+  Serial.print("Got IP: ");  Serial.println(WiFi.localIP());
 
+  ws.onEvent(eventHandler);
+  server.addHandler(&ws);
 
-  //ESPNOW adding the slave peers 
-
-   // register peer
-  peerInfo.channel = 0;  
-  peerInfo.encrypt = false;
-  // register first peer  
-  memcpy(peerInfo.peer_addr, broadcastAddress1, 2);
-  if (esp_now_add_peer(&peerInfo) != ESP_OK){
-    Serial.println("Failed to add peer");
-    return;
-  }
-  // register second peer  
-  memcpy(peerInfo.peer_addr, broadcastAddress2, 2);
-  if (esp_now_add_peer(&peerInfo) != ESP_OK){
-    Serial.println("Failed to add peer");
-    return;
-  }
-
-
+  // Route for root / web page
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/html", index_html);
+    request->send_P(200, "text/html", index_html, processor);
   });
-   
-  events.onConnect([](AsyncEventSourceClient *client){
-    if(client->lastId()){
-      Serial.printf("Client reconnected! Last message ID that it got is: %u\n", client->lastId());
-    }
-    // send event with message "hello!", id current millis
-    // and set reconnect delay to 1 second
-    client->send("hello!", NULL, millis(), 10000);
-  });
-  server.addHandler(&events);
+
+  // Start server
   server.begin();
 
-
-  //FastLED setup 
+  //FASTLED setup 
   FastLED.addLeds<WS2812B, LED_PIN, GRB>(leds, NUM_LEDS);
   FastLED.setBrightness(100);
-
-}
-void broadcast(){
-  broadcast_message.start = random(0,20);
-  broadcast_message.end = random(0,20);
-  broadcast_message.color = random(0,20);
-  broadcast_message.time = random(0,20);
- 
-  esp_err_t result = esp_now_send(0, (uint8_t *) &broadcast_message, sizeof(broadcast_message_struct));
-   
-  if (result == ESP_OK) {
-    Serial.println("Sent with success");
-  }
-  else {
-    Serial.println("Error sending the data");
-  }
-}
-void loop(){
-  static unsigned long lastEventTime = millis();
-  static const unsigned long EVENT_INTERVAL_MS = 5000;
-  if ((millis() - lastEventTime) > EVENT_INTERVAL_MS) {
-    events.send("ping",NULL,millis());
-    lastEventTime = millis();
-  }
-
-  delay(500) ; 
-  leds[0] = CRGB::Blue ; 
-  FastLED.show() ; 
-  delay(500) ; 
-  FastLED.clear() ; 
-  FastLED.show() ; 
-  broadcast() ; 
-  
 }
 
+void loop() {
+  ws.cleanupClients();
 
+  while(ledState){
+     delay(500) ; 
+    leds[0] = CRGB::Blue ; 
+    FastLED.show() ; 
+    delay(500) ; 
+    fill_solid(leds, 3, CRGB::Red);
+    FastLED.show() ; 
+    delay(500) ; 
+    FastLED.clear() ; 
+    FastLED.show() ; 
+  }
 
+}

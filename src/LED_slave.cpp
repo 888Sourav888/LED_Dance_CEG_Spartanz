@@ -1,3 +1,6 @@
+//this code is responsible for having for recieving brodcast message from master and 
+//display the lights in the array 
+
 // #include <esp_now.h>
 // #include <WiFi.h>
 // #include "ESPAsyncWebServer.h"
