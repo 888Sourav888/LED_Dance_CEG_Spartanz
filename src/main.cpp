@@ -69,7 +69,11 @@ const char index_html[] PROGMEM = R"rawliteral(
 		  }
 		};
 		
-		document.getElementById('toggle-btn').addEventListener('change', function() { websocket.send('toggle'); });
+		document.getElementById('toggle-btn').addEventListener('change', function() { websocket.send('toggle');
+      fetch("http://192.168.139.127/request");
+      
+    
+     });
 	  });
 	</script>
   </body>
@@ -123,6 +127,15 @@ String processor(const String& var){
 
 CRGB leds[NUM_LEDS];
 
+
+
+IPAddress staticIP(192,168,139,150) ; 
+IPAddress gateway(192,168,139,76) ; 
+IPAddress subnet(255,255,255,0) ; 
+IPAddress dns1(192,168,139,76) ; 
+IPAddress dns2(0,0,0,0) ; 
+
+
 void setup(){
   // Serial port for debugging purposes
   Serial.begin(9600);
@@ -133,6 +146,11 @@ void setup(){
   Serial.print("Connecting to ");
   Serial.println(ssid);
   
+
+  if(WiFi.config(staticIP , gateway , subnet , dns1 , dns2) == false){
+    Serial.println("Configuration failed!"); 
+  }
+
   // Connect to Wi-Fi
   WiFi.begin(ssid, password);
   
@@ -140,6 +158,14 @@ void setup(){
     delay(1000);
     Serial.print(".");
   }
+
+
+  Serial.print("Local IP:") ; Serial.println(WiFi.localIP()) ; 
+  Serial.print("Subnet Mask:") ; Serial.println(WiFi.subnetMask()) ; 
+  Serial.print("Gateway IP:") ; Serial.println(WiFi.gatewayIP()) ; 
+  Serial.println("DNS 1:");  Serial.println(WiFi.dnsIP(0)); 
+  Serial.println("DNS 2:"); Serial.println(WiFi.dnsIP(1)); 
+
   
   Serial.println("");
   Serial.println("Connected..!");
@@ -151,6 +177,12 @@ void setup(){
   // Route for root / web page
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send_P(200, "text/html", index_html, processor);
+  });
+
+  server.on("/request", HTTP_GET, [](AsyncWebServerRequest *request){
+    Serial.println("I got request from the chrome browser") ; 
+    ledState = !ledState ; 
+    //request->send_P(200, "text/html", index_html, processor);
   });
 
   // Start server
