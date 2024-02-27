@@ -6,8 +6,8 @@
 
 
 // Replace with your network credentials
-const char* ssid = "REPLACE_WITH_YOUR_SSID";
-const char* password = "REPLACE_WITH_YOUR_PASSWORD";
+const char* ssid = "Redmi Note 10 Pro";
+const char* password = "mtmz9543";
 
 bool ledState = 0;
 const int ledPin = 2;
@@ -125,7 +125,7 @@ CRGB leds[NUM_LEDS];
 
 void setup(){
   // Serial port for debugging purposes
-  Serial.begin(115200);
+  Serial.begin(9600);
 
   // pinMode(ledPin, OUTPUT);
   // digitalWrite(ledPin, LOW);
@@ -175,5 +175,5 @@ void loop() {
     FastLED.clear() ; 
     FastLED.show() ; 
   }
-
+ 
 }
