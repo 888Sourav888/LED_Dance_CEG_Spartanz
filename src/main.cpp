@@ -69,11 +69,7 @@ const char index_html[] PROGMEM = R"rawliteral(
 		  }
 		};
 		
-		document.getElementById('toggle-btn').addEventListener('change', function() { websocket.send('toggle');
-      fetch("http://192.168.139.127/request");
-      
-    
-     });
+		document.getElementById('toggle-btn').addEventListener('change', function() { websocket.send('toggle'); });
 	  });
 	</script>
   </body>
@@ -122,19 +118,10 @@ String processor(const String& var){
 
 // //FastLED setup 
 
-#define NUM_LEDS  18
+#define NUM_LEDS  1000
 #define LED_PIN   2
 
 CRGB leds[NUM_LEDS];
-
-
-
-IPAddress staticIP(192,168,139,150) ; 
-IPAddress gateway(192,168,139,76) ; 
-IPAddress subnet(255,255,255,0) ; 
-IPAddress dns1(192,168,139,76) ; 
-IPAddress dns2(0,0,0,0) ; 
-
 
 void setup(){
   // Serial port for debugging purposes
@@ -143,50 +130,31 @@ void setup(){
   // pinMode(ledPin, OUTPUT);
   // digitalWrite(ledPin, LOW);
 
-  Serial.print("Connecting to ");
-  Serial.println(ssid);
+  // Serial.print("Connecting to ");
+  // Serial.println(ssid);
   
-
-  if(WiFi.config(staticIP , gateway , subnet , dns1 , dns2) == false){
-    Serial.println("Configuration failed!"); 
-  }
-
   // Connect to Wi-Fi
-  WiFi.begin(ssid, password);
+  // WiFi.begin(ssid, password);
   
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(1000);
-    Serial.print(".");
-  }
-
-
-  Serial.print("Local IP:") ; Serial.println(WiFi.localIP()) ; 
-  Serial.print("Subnet Mask:") ; Serial.println(WiFi.subnetMask()) ; 
-  Serial.print("Gateway IP:") ; Serial.println(WiFi.gatewayIP()) ; 
-  Serial.println("DNS 1:");  Serial.println(WiFi.dnsIP(0)); 
-  Serial.println("DNS 2:"); Serial.println(WiFi.dnsIP(1)); 
-
+  // while (WiFi.status() != WL_CONNECTED) {
+  //   delay(1000);
+  //   Serial.print(".");
+  // }
   
-  Serial.println("");
-  Serial.println("Connected..!");
-  Serial.print("Got IP: ");  Serial.println(WiFi.localIP());
+  // Serial.println("");
+  // Serial.println("Connected..!");
+  // Serial.print("Got IP: ");  Serial.println(WiFi.localIP());
 
-  ws.onEvent(eventHandler);
-  server.addHandler(&ws);
+  // ws.onEvent(eventHandler);
+  // server.addHandler(&ws);
 
-  // Route for root / web page
-  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/html", index_html, processor);
-  });
-
-  server.on("/request", HTTP_GET, [](AsyncWebServerRequest *request){
-    Serial.println("I got request from the chrome browser") ; 
-    ledState = !ledState ; 
-    //request->send_P(200, "text/html", index_html, processor);
-  });
+  // // Route for root / web page
+  // server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
+  //   request->send_P(200, "text/html", index_html, processor);
+  // });
 
   // Start server
-  server.begin();
+  // server.begin();
 
   //FASTLED setup 
   FastLED.addLeds<WS2812B, LED_PIN, GRB>(leds, NUM_LEDS);
@@ -194,18 +162,35 @@ void setup(){
 }
 
 void loop() {
-  ws.cleanupClients();
+  // ws.cleanupClients();
 
-  while(ledState){
+  // while(ledState){
      delay(500) ; 
     leds[0] = CRGB::Blue ; 
     FastLED.show() ; 
     delay(500) ; 
-    fill_solid(leds, 3, CRGB::Red);
+    fill_solid(leds, NUM_LEDS, CRGB::Green);
     FastLED.show() ; 
     delay(500) ; 
+    fill_solid(leds, NUM_LEDS, CRGB::Purple);
+    FastLED.show() ; 
+    delay(500) ; 
+    fill_solid(leds, NUM_LEDS, CRGB::Orange);
+    FastLED.show() ; 
+    delay(500) ; 
+    fill_solid(leds, NUM_LEDS, CRGB::Red);
+    FastLED.show() ; 
     FastLED.clear() ; 
     FastLED.show() ; 
-  }
+    delay(500) ; 
+    for(int i = 0 ;i < NUM_LEDS ; i++){
+      leds[i] = CRGB::Blue ; 
+      FastLED.show() ; 
+      delay(10) ; 
+    
+    }
+    FastLED.clear() ; 
+    FastLED.show() ; 
+  // }
  
 }
