@@ -1,3 +1,7 @@
+// Lead dancer code 
+// coded for Vetri's shirt 
+// Reason for Vetri shirt : that shirt design was completed first
+
 // Import required libraries
 #include <WiFi.h>
 #include <AsyncTCP.h>
@@ -6,8 +10,8 @@
 
 
 // Replace with your network credentials
-const char* ssid = "Redmi Note 10 Pro";
-const char* password = "mtmz9543";
+const char* ssid = "";
+const char* password = "";
 
 bool ledState = 0;
 const int ledPin = 2;
@@ -164,33 +168,32 @@ void setup(){
 void loop() {
   // ws.cleanupClients();
 
-  // while(ledState){
-     delay(500) ; 
-    leds[0] = CRGB::Blue ; 
+  //Pudhiya manidha boomiku vaa frame 
+  // song bit starts at 00:04 sec ends at 00:11 ; so totally 7 seconds 
+  //140 LEDs in 7 seconds if delay is 50
+  //frame1 code starts 
+
+  int  end = 144  ;  
+  int counter1 = 0 , counter2 = 145 ; 
+  //for idea 1 pant code 
+  int counter3=288 , counter4 = 375 ; 
+  for(int i = 0 ; i < end ; i++){
+    //counter1 and counter2 is for shirt 
+    //pant code must be added 
+    leds[counter1] = CRGB::Blue ; 
+    leds[counter2] = CRGB::Blue ; 
+    leds[counter3] = CRGB::Blue ; 
+    leds[counter4] = CRGB::Blue ; 
+    counter1++ ; counter2++ ; 
+    counter3++ ; counter4++ ; 
+    delay(50) ; 
     FastLED.show() ; 
-    delay(500) ; 
-    fill_solid(leds, NUM_LEDS, CRGB::Green);
-    FastLED.show() ; 
-    delay(500) ; 
-    fill_solid(leds, NUM_LEDS, CRGB::Purple);
-    FastLED.show() ; 
-    delay(500) ; 
-    fill_solid(leds, NUM_LEDS, CRGB::Orange);
-    FastLED.show() ; 
-    delay(500) ; 
-    fill_solid(leds, NUM_LEDS, CRGB::Red);
-    FastLED.show() ; 
-    FastLED.clear() ; 
-    FastLED.show() ; 
-    delay(500) ; 
-    for(int i = 0 ;i < NUM_LEDS ; i++){
-      leds[i] = CRGB::Blue ; 
-      FastLED.show() ; 
-      delay(10) ; 
-    
-    }
-    FastLED.clear() ; 
-    FastLED.show() ; 
-  // }
+  }
+  delay(2000) ; 
+  fill_solid(leds, NUM_LEDS , CRGB::Yellow) ; 
+  delay(5000) ; 
+  FastLED.clear() ; 
+  delay(100) ; 
+
  
 }
