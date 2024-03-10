@@ -1,6 +1,4 @@
 // Lead dancer code 
-// coded for Vetri's shirt 
-// Reason for Vetri shirt : that shirt design was completed first
 
 // Import required libraries
 #include <WiFi.h>
@@ -127,6 +125,27 @@ String processor(const String& var){
 
 CRGB leds[NUM_LEDS];
 
+void DrawMarquee(){
+  static byte j = HUE_BLUE ;
+  j+=4 ;
+  byte k = j;
+
+  CRGB c;
+  for(int i = 0 ;i<NUM_LEDS;i++){
+    leds[i]=c.setHue(k+=8);
+  }
+
+  static int scroll = 0;
+  scroll++;
+  for(int i =scroll%20 ;i<NUM_LEDS;i+=20){
+    leds[i] = CRGB::Black;
+  }
+
+  delay(50);
+}
+
+unsigned long startTime = 0; 
+
 void setup(){
   // Serial port for debugging purposes
   Serial.begin(9600);
@@ -162,38 +181,366 @@ void setup(){
 
   //FASTLED setup 
   FastLED.addLeds<WS2812B, LED_PIN, GRB>(leds, NUM_LEDS);
-  FastLED.setBrightness(100);
+  FastLED.setBrightness(5);
 }
 
 void loop() {
   // ws.cleanupClients();
-
+  
   //Pudhiya manidha boomiku vaa frame 
   // song bit starts at 00:04 sec ends at 00:11 ; so totally 7 seconds 
   //140 LEDs in 7 seconds if delay is 50
   //frame1 code starts 
 
-  int  end = 144  ;  
+  int  end = 145  ;  
   int counter1 = 0 , counter2 = 145 ; 
   //for idea 1 pant code 
-  int counter3=288 , counter4 = 375 ; 
+  // int counter3=288 , counter4 = 375 ; 
   for(int i = 0 ; i < end ; i++){
     //counter1 and counter2 is for shirt 
     //pant code must be added 
     leds[counter1] = CRGB::Blue ; 
     leds[counter2] = CRGB::Blue ; 
-    leds[counter3] = CRGB::Blue ; 
-    leds[counter4] = CRGB::Blue ; 
+    // leds[counter3] = CRGB::Blue ; 
+    // leds[counter4] = CRGB::Blue ; 
     counter1++ ; counter2++ ; 
-    counter3++ ; counter4++ ; 
+    // counter3++ ; counter4++ ; 
     delay(50) ; 
     FastLED.show() ; 
   }
-  delay(2000) ; 
-  fill_solid(leds, NUM_LEDS , CRGB::Yellow) ; 
-  delay(5000) ; 
+
+  //this delay is for blue light to be visible till pudhiya manidha fully ends 
+  delay(1000) ; 
+  
+
+  //appo sillunu oru kaathu - blackout 
   FastLED.clear() ; 
-  delay(100) ; 
+  FastLED.show() ; 
+  delay(3800) ; //maybe 4 seconds ku maathikalaam 
+
+  //yellow for red heart frame 
+  fill_solid(leds , NUM_LEDS , CRGB::Yellow) ; 
+  FastLED.show();
+  delay(8900); 
+
+  end = 10 ; 
+  for(int i = 0 ; i < end ;i++){
+    FastLED.clear() ; 
+    FastLED.show() ; 
+    delay(50) ; 
+    fill_solid(leds , NUM_LEDS , CRGB::Yellow) ; 
+    FastLED.show() ; 
+    delay(50) ; 
+  }
+
+  //palichunu irukura heart frame 
+  fill_solid(leds , NUM_LEDS , CRGB::Red) ; 
+  FastLED.show() ; 
+  delay(20000) ; 
+
+  //blackout 
+  FastLED.clear() ; 
+  FastLED.show() ; 
+  delay(3600) ; //maybe 4 seconds ku maathikalaam 
+
+  //wings frame 
+  fill_solid(leds , NUM_LEDS , CRGB::Purple) ; 
+  FastLED.show() ; 
+  delay(9000) ; 
+
+
+  //blue heart frame 
+  fill_solid(leds , NUM_LEDS , CRGB::Orange) ; 
+  FastLED.show() ; 
+  delay(10000) ; 
+
+
+  //moon frame 
+  fill_solid(leds , NUM_LEDS , CRGB::DarkRed) ; 
+  FastLED.show() ; 
+  delay(18000) ; 
+
+  //vinmeengal thaan unthan kanmeenele
+  fill_solid(leds , NUM_LEDS , CRGB::Green) ; 
+  FastLED.show() ; 
+  delay(10000) ; 
+
+  //blackout 
+  FastLED.clear() ; 
+  FastLED.show() ; 
+  delay(1200) ; //maybe 4 seconds ku maathikalaam
+  
+
+
+  //muqabala code 
+  //moonwalk half shirt and half leg code 
+  fill_solid(leds , NUM_LEDS , CRGB::Orange) ; 
+  FastLED.show() ; 
+  delay(5100) ; 
+  FastLED.clear() ; 
+  FastLED.show() ; 
+  end = 140 ; 
+  //half shirt one color another another color 
+  int startLED  = 3; 
+  int endLED = 43;  
+  fill_solid(&leds[startLED], endLED - startLED + 1, CRGB::Orange);
+  FastLED.show() ; 
+  delay(500) ; 
+  FastLED.clear() ; 
+   startLED  = 60; 
+  endLED = 140;  
+  fill_solid(&leds[startLED], endLED - startLED + 1, CRGB::Orange);
+  FastLED.show() ; 
+  delay(500) ; 
+  FastLED.clear() ; 
+
+
+  //oo eh oo code uh 
+  //color change to green shirt && blue pant 
+  fill_solid(leds , NUM_LEDS , CRGB::Green) ; 
+  //pant blue color 
+  FastLED.show() ; 
+  delay(2100) ; 
+
+  //oo oh oo On 
+  //on dancer2 
+  fill_solid(leds , NUM_LEDS , CRGB::Red); //on dancer2 
+  FastLED.show() ; 
+  delay(800) ; 
+
+  //on dancer3
+  //oo oh oo On 
+  //oo eh oh oh.....
+  fill_solid(leds , NUM_LEDS , CRGB::Blue); //on dancer3
+  FastLED.show() ; 
+  delay(3400) ; 
+
+  //off dancer2 ; 
+  fill_solid(leds , NUM_LEDS , CRGB::Green) ; 
+  FastLED.show() ; 
+  delay(400) ; 
+
+
+  //off dancer3 ; 
+  fill_solid(leds , NUM_LEDS , CRGB::Purple) ; 
+  FastLED.show() ; 
+  delay(400) ; 
+
+
+  //aaya oo aaj meh 
+  //dancer1 ; 
+  fill_solid(leds , NUM_LEDS , CRGB::Orange) ; 
+  FastLED.show() ; 
+  delay(2100) ; 
+  //clear dancer1 here 
+
+  // tak 
+  //dancer 2 on ; 
+  fill_solid(leds , NUM_LEDS , CRGB::Red) ; 
+  FastLED.show() ; 
+  delay(500) ; 
+  //clear dancer 2 here 
+
+
+  //tak 
+  //dancer1 on ; 
+  fill_solid(leds , NUM_LEDS , CRGB::Blue) ; 
+  FastLED.show() ; 
+  delay(500) ; 
+  //clear dancer 1 here 
+
+
+  //tak 
+  //lekin jayoonga dhil mera...
+  //dancer3 on ; 
+  fill_solid(leds , NUM_LEDS , CRGB::Green) ; 
+  FastLED.show() ; 
+  delay(3200) ;
+  //clear dancer 3 here 
+
+
+  //tak 
+  //dancer 1 on ; 
+  fill_solid(leds , NUM_LEDS , CRGB::Red) ; 
+  FastLED.show() ; 
+  delay(700) ;
+  //clear dancer 1 
+
+
+  //tak 
+  //dancer 3 on ; 
+  fill_solid(leds , NUM_LEDS , CRGB::Blue) ; 
+  FastLED.show() ; 
+  delay(700) ;
+  //clear dancer 3 
+
+
+  //tak 
+  //dancer 2 on ; 
+  fill_solid(leds , NUM_LEDS , CRGB::Green) ; 
+  FastLED.show() ; 
+  delay(800) ;
+
+  //rub uh koiyi mujhe thoose thoo muje 
+  
+  //dancer1 on ; 
+  fill_solid(leds , NUM_LEDS , CRGB::Orange) ; 
+  FastLED.show() ; 
+  delay(5800) ;
+
+  //dancer1 body ; 
+  //rainbow 
+  // fill_solid(leds , NUM_LEDS , CRGB::White) ; 
+  // FastLED.show() ; 
+  // delay(3000) ;
+
+//thooka muse chahaas mila  , oh eh ho 
+
+   uint8_t initialHue1=0;
+   const uint8_t deltaHue1=16;
+   const uint8_t hueDensity1=4;
+   fill_rainbow(leds,NUM_LEDS,initialHue1-=hueDensity1,deltaHue1);
+    FastLED.show();
+  //dancer 2 right hand ; 
+  
+
+  // dancer3 left hand ; 
+
+  //muqala muqabala lele...
+  startTime = millis();  // Record the start time
+
+  while (millis() - startTime < 5800) {  // Run for 5 seconds
+    fill_rainbow(leds, NUM_LEDS, initialHue1 -= hueDensity1, deltaHue1);
+    FastLED.show();
+    initialHue1++;
+  }
+  
+  
+  //le la 
+  //dancer2 
+  fill_solid(leds , NUM_LEDS , CRGB::Red) ; 
+  FastLED.show() ; 
+  delay(50) ; 
+  FastLED.clear();
+  FastLED.show() ; 
+  delay(50)  ;
+
+  //dancer3
+  fill_solid(leds , NUM_LEDS , CRGB::Red) ; 
+  FastLED.show() ; 
+  delay(50) ; 
+  FastLED.clear();
+   FastLED.show() ; 
+  
+
+
+  //ohhhh..
+
+  fill_solid(leds , NUM_LEDS , CRGB::Red) ; 
+  FastLED.show() ;
+  delay(1500)  ;
+
+  //le la
+  //dancer2 
+  fill_solid(leds , NUM_LEDS , CRGB::Red) ; 
+  FastLED.show() ; 
+  delay(50) ; 
+  FastLED.clear();
+   FastLED.show() ; 
+  delay(50)  ;
+
+  //dancer1
+  fill_solid(leds , NUM_LEDS , CRGB::Red) ; 
+  FastLED.show() ; 
+  delay(50) ; 
+  FastLED.clear();
+   FastLED.show() ; 
+  delay(1500)  ;
+  fill_solid(leds , NUM_LEDS , CRGB::Red) ; 
+  FastLED.show() ; 
+
+
+
+
+  //muqabala suvaanallla  lele...
+  startTime = millis();  // Record the start time
+
+  while (millis() - startTime < 5000) {  // Run for 5 seconds
+    fill_rainbow(leds, NUM_LEDS, initialHue1 -= hueDensity1, deltaHue1);
+    FastLED.show();
+    initialHue1++;
+  }
+  
+  
+  //le la 
+  //dancer2 
+  fill_solid(leds , NUM_LEDS , CRGB::Red) ; 
+  FastLED.show() ; 
+  delay(50) ; 
+  FastLED.clear();
+  FastLED.show() ; 
+  delay(50)  ;
+
+  //dancer3
+  fill_solid(leds , NUM_LEDS , CRGB::Red) ; 
+  FastLED.show() ; 
+  delay(50) ; 
+  FastLED.clear();
+   FastLED.show() ; 
+  
+
+
+  //ohhhh..
+
+  fill_solid(leds , NUM_LEDS , CRGB::Red) ; 
+  FastLED.show() ;
+  delay(1500)  ;
+
+  //le la
+  //dancer2 
+  fill_solid(leds , NUM_LEDS , CRGB::Red) ; 
+  FastLED.show() ; 
+  delay(50) ; 
+  FastLED.clear();
+   FastLED.show() ; 
+  delay(50)  ;
+
+  //dancer1
+  fill_solid(leds , NUM_LEDS , CRGB::Red) ; 
+  FastLED.show() ; 
+  delay(50) ; 
+  FastLED.clear();
+   FastLED.show() ; 
+  delay(1500)  ;
+  fill_solid(leds , NUM_LEDS , CRGB::Red) ; 
+  FastLED.show() ; 
+  
+
+  //bass drop ku oru  from leg to top light varanum
+  //inga our color varanum
+
+
+
+  //dancer all 
+
+  fill_solid(leds , NUM_LEDS , CRGB::Green) ; 
+  FastLED.show() ; 
+  
+
+   
+  delay(16000) ; 
+
+
+
+
+
+
+
+  //chumma delay 
+    
+    delay(20000) ; 
+    FastLED.clear() ; 
+    delay(100) ; 
 
  
 }

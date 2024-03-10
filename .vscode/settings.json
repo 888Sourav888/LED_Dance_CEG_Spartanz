@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "*.ejs": "html",
-        "bitset": "cpp"
+        "bitset": "cpp",
+        "random": "cpp"
     }
 }
