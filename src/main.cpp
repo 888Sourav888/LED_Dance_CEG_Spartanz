@@ -79,7 +79,8 @@ const char index_html[] PROGMEM = R"rawliteral(
 		
 		document.getElementById('toggle-btn').addEventListener('change', function() { 
       
-      websocket.send('toggle');
+     
+      fetch("http://spartanz.local/request");
         fetch("http://spartanz_leg.local/request");
          
        });
@@ -243,12 +244,13 @@ void setup(){
     request->send_P(200, "text/html", index_html, processor);
   });
 
-   server.on("/request", HTTP_GET, [](AsyncWebServerRequest *request){
+  server.on("/request", HTTP_GET, [](AsyncWebServerRequest *request){
     if(led_on != 1 ) led_on = 1 ; 
       else led_on = 2 ;
 
     ledState = !ledState ;  
-    //request->send_P(200, "text/html", index_html, processor);
+
+    request->send(200, "text/plain", "Request received successfully");
   });
 
 
@@ -334,7 +336,8 @@ void loop() {
   delay(3600) ; //maybe 4 seconds ku maathikalaam 
 
   //wings frame 
-  fill_solid(leds , NUM_LEDS , CRGB::Purple) ; 
+  FastLED.clear() ; 
+  //fill_solid(leds , NUM_LEDS , CRGB::Purple) ; 
   FastLED.show() ; 
   delay(9000) ; 
 
@@ -696,7 +699,7 @@ void loop() {
 
   //dancer all 
 
-  fill_solid(leds , NUM_LEDS , CRGB::Green) ; 
+  FastLED.clear() ; 
   FastLED.show() ; 
   
 
