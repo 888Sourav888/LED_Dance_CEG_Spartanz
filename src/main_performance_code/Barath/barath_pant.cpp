@@ -520,8 +520,10 @@
 
 
 // //thooka muse chahaas mila  , oh eh ho // data sheet 
-//   fill_solid(leds , NUM_LEDS , CRGB::Orange) ; 
-//   FastLED.show() ; 
+// //   fill_solid(leds , NUM_LEDS , CRGB::Orange) ; 
+// //   FastLED.show() ; 
+//    FastLED.clear() ; 
+//    FastLED.show() ; 
 //   delay(3200) ; 
 
 //   //dancer 2 right hand ; 
