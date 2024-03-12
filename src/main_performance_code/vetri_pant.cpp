@@ -374,11 +374,13 @@
 //   //ooo ra ra uyya ra ra 
 //   //moonwalk half shirt and half leg code 
 //   // FastLED.clear() ; 
-//   fill_solid(leds , NUM_LEDS , CRGB::Orange) ; // need data sheet for barath here and put pant color code 
+//     int s = 0 ; 
+//     int e = 42 ; 
+//   fill_solid(&leds[s], e - s + 1, CRGB::Orange);
 //   FastLED.show() ; 
 //   delay(5800) ; 
-//   // FastLED.clear() ; 
-//   // FastLED.show() ; 
+//   FastLED.clear() ; 
+//   FastLED.show() ; 
 //   end = 140 ; 
 //   //half shirt one color another another color 
 //   int startLED  = 131; 

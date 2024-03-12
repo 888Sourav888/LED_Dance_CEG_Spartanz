@@ -135,7 +135,7 @@
 
 // // //FastLED setup 
 
-// #define NUM_LEDS  240
+// #define NUM_LEDS  250
 // #define LED_PIN   2
 
 // CRGB leds[NUM_LEDS];
@@ -381,8 +381,8 @@
 //   fill_solid(leds , NUM_LEDS , CRGB::Orange) ; // need data sheet for barath here and put pant color code 
 //   FastLED.show() ; 
 //   delay(5800) ; 
-//   // FastLED.clear() ; 
-//   // FastLED.show() ; 
+//   FastLED.clear() ; 
+//   FastLED.show() ; 
 //   end = 140 ; 
 //   //half shirt one color another another color 
 //   int startLED  = 100; 
@@ -525,8 +525,8 @@
 //   int startLED2  = 93 , endLED2 = 99 ; 
 //   int startLED3 = 100 , endLED3 = 105;
 //   int startLED4 = 165  , endLED4 = 245 ;   
-//   // fill_solid(&leds[startLED1], endLED1 - startLED1 + 1, CRGB::Orange);
-//   // FastLED.show()  ;
+//   fill_solid(&leds[startLED1], endLED1 - startLED1 + 1, CRGB::Orange);
+//   FastLED.show()  ;
 //   fill_solid(&leds[startLED2], endLED2 - startLED2 + 1, CRGB::Orange);
 //   FastLED.show() ; 
 //   fill_solid(&leds[startLED3], endLED3 - startLED3 + 1, CRGB::Orange);
