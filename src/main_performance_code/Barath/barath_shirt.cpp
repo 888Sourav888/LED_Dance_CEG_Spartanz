@@ -294,7 +294,7 @@
 //   }
   
 //   //this delay is for blue light to be visible till pudhiya manidha fully ends 
-//   delay(4500) ; 
+//   delay(5000) ; 
   
  
 //   //appo sillunu oru kaathu - blackout 
@@ -715,7 +715,7 @@
 //   delay(16000) ; 
 
 
-
+ 
 
 
 

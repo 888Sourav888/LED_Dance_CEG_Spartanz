@@ -1,4 +1,4 @@
-// Lead dancer code 
+Lead dancer code 
 
 // Import required libraries
 #include <WiFi.h>
@@ -79,7 +79,6 @@ const char index_html[] PROGMEM = R"rawliteral(
 		
 		document.getElementById('toggle-btn').addEventListener('change', function() { 
       
-     
       
          
        });
@@ -133,7 +132,7 @@ String processor(const String& var){
 
 // //FastLED setup 
 
-#define NUM_LEDS  240
+#define NUM_LEDS  246
 #define LED_PIN   2
 
 CRGB leds[NUM_LEDS];
@@ -224,7 +223,7 @@ void setup(){
     Serial.print(".");
   }
   
-    if(!MDNS.begin("barath")){
+    if(!MDNS.begin("barath_leg")){
     Serial.println("Error starting mDNS") ; 
   }
   else{
@@ -243,7 +242,7 @@ void setup(){
     request->send_P(200, "text/html", index_html, processor);
   });
 
-  server.on("/request", HTTP_GET, [](AsyncWebServerRequest *request){
+   server.on("/request", HTTP_GET, [](AsyncWebServerRequest *request){
     if(led_on != 1 ) led_on = 1 ; 
       else led_on = 2 ;
 
@@ -277,8 +276,6 @@ void loop() {
   int counter1 = 0 , counter2 = 145 ; 
   //for idea 1 pant code 
   // int counter3=288 , counter4 = 375 ; 
-  leds[0] = CRGB::Blue ;  
-    FastLED.show() ; 
   for(int i = 0 ; i < end ; i++){
     //counter1 and counter2 is for shirt 
     //pant code must be added 
@@ -294,7 +291,7 @@ void loop() {
   }
   
   //this delay is for blue light to be visible till pudhiya manidha fully ends 
-  delay(4500) ; 
+  delay(5000) ; 
   
  
   //appo sillunu oru kaathu - blackout 
@@ -375,22 +372,26 @@ void loop() {
   //muqabala code 
   //ooo ra ra uyya ra ra 
   //moonwalk half shirt and half leg code 
-  FastLED.clear() ; 
-//   fill_solid(leds , NUM_LEDS , CRGB::Orange) ; // need data sheet for barath here and put pant color code 
+  //pant code adikanum 
+  int s = 42 ; 
+  int e = 207 ; 
+  fill_solid(&leds[s], e - s + 1, CRGB::Orange);
+
+//   fill_solid(leds , NUM_LEDS , CRGB::Orange) ; 
   FastLED.show() ; 
   delay(5800) ; 
   FastLED.clear() ; 
   FastLED.show() ; 
   end = 140 ; 
   //half shirt one color another another color 
-  int startLED  = 100; 
-  int endLED = 245;  
+  int startLED  = 131; 
+  int endLED = 219;  
 //   fill_solid(&leds[startLED], endLED - startLED + 1, CRGB::Orange);
 //   FastLED.show() ; 
   delay(500) ; 
   FastLED.clear() ; 
    startLED  = 0; 
-  endLED = 99;  
+  endLED = 130;  
 //   fill_solid(&leds[startLED], endLED - startLED + 1, CRGB::Orange);
 //   FastLED.show() ; 
   delay(500) ; 
@@ -404,9 +405,16 @@ void loop() {
 
   //dancer 2 on 
   //color change to green shirt && blue pant 
-//   fill_solid(leds , NUM_LEDS , CRGB::Green) ; 
-  //pant blue color 
+//   int startLED1  = 43; 
+//   int endLED1 = 220;  
+//   fill_solid(&leds[startLED1], endLED1 - startLED1 + 1, CRGB::Blue);
 //   FastLED.show() ; 
+//   startLED1 = 0 ; 
+//   endLED1 = 42 ; 
+//   fill_solid(&leds[startLED1], endLED1 - startLED1 + 1, CRGB::Green);
+//   FastLED.show() ; 
+
+  //pant blue color 
   delay(2100) ; 
 
   //oo oh oo On 
@@ -423,10 +431,8 @@ void loop() {
   delay(3400) ; 
 
   //off dancer2 ; 
-  FastLED.clear() ; 
+    FastLED.clear() ; 
   FastLED.show() ; 
-  // fill_solid(leds , NUM_LEDS , CRGB::Green) ; 
-  // FastLED.show() ; 
   delay(400) ; 
 
 
@@ -456,8 +462,8 @@ void loop() {
 
   //tak 
   //dancer1 on ; 
-  FastLED.clear() ; 
 //   fill_solid(leds , NUM_LEDS , CRGB::Blue) ; 
+ FastLED.clear()  ;
   FastLED.show() ; 
   delay(500) ; 
   FastLED.clear() ; 
@@ -476,7 +482,7 @@ void loop() {
 
   //tak 
   //dancer 3 on ; 
-  // fill_solid(leds , NUM_LEDS , CRGB::Blue) ; 
+  // fill_solid(leds , NUM_LEDS , CRGB::Red) ; 
   // FastLED.show() ; 
   delay(700) ;
   //clear dancer 3 
@@ -516,20 +522,11 @@ void loop() {
   // delay(3000) ;
 
 
-//thooka muse chahaas mila  , oh eh ho 
-// need data sheet for barath to do this 
-  int startLED1 =  31 ,  endLED1 = 91 ; 
-//   int startLED2  = 93 , endLED2 = 99 ; 
-//   int startLED3 = 100 , endLED3 = 105;
-//   int startLED4 = 165  , endLED4 = 245 ;   
-  fill_solid(&leds[startLED1], endLED1 - startLED1 + 1, CRGB::Orange);
-  FastLED.show()  ;
-//   fill_solid(&leds[startLED2], endLED2 - startLED2 + 1, CRGB::Orange);
+//thooka muse chahaas mila  , oh eh ho // data sheet 
+//   fill_solid(leds , NUM_LEDS , CRGB::Orange) ; 
 //   FastLED.show() ; 
-//   fill_solid(&leds[startLED3], endLED3 - startLED3 + 1, CRGB::Orange);
-//   FastLED.show() ; 
-//   fill_solid(&leds[startLED4], endLED4 - startLED4 + 1, CRGB::Orange);  
-//   FastLED.show() ; 
+   FastLED.clear() ; 
+   FastLED.show() ; 
   delay(3200) ; 
 
   //dancer 2 right hand ; 
@@ -556,8 +553,7 @@ void loop() {
           
           FastLED.show();
     }
-   
-  
+    
   //le la 
   //dancer2 
   // fill_solid(leds , NUM_LEDS , CRGB::Red) ; 
@@ -567,8 +563,9 @@ void loop() {
   // FastLED.show() ; 
   // delay(50)  ;
   delay(100) ; 
-   FastLED.clear() ; 
+  FastLED.clear() ; 
     FastLED.show() ; 
+  
 
   //dancer3
   // fill_solid(leds , NUM_LEDS , CRGB::Red) ; 
@@ -597,7 +594,7 @@ void loop() {
           FastLED.show();
     }
 
-  
+
 
   //le la
   //dancer2 
@@ -609,7 +606,7 @@ void loop() {
   // delay(50)  ;
 
   delay(100) ; 
-  FastLED.clear() ; 
+    FastLED.clear() ; 
   FastLED.show() ; 
 
   //dancer1
@@ -715,7 +712,7 @@ void loop() {
   delay(16000) ; 
 
 
-
+ 
 
 
 
