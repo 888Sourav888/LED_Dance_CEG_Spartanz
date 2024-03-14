@@ -265,7 +265,7 @@
   
 
 //   while(led_on == 1 ){
-
+  
  
 //   //Pudhiya manidha boomiku vaa frame 
 //   // song bit starts at 00:04 sec ends at 00:11 ; so totally 7 seconds 
@@ -276,6 +276,8 @@
 //   int counter1 = 0 , counter2 = 145 ; 
 //   //for idea 1 pant code 
 //   // int counter3=288 , counter4 = 375 ; 
+//  leds[0] = CRGB::Blue ; 
+//   FastLED.show() ; 
 //   for(int i = 0 ; i < end ; i++){
 //     //counter1 and counter2 is for shirt 
 //     //pant code must be added 
@@ -456,7 +458,8 @@
 //   fill_solid(leds , NUM_LEDS , CRGB::Blue) ; 
 //   FastLED.show() ; 
 //   delay(500) ; 
-//   // FastLED.clear() ; 
+//    FastLED.clear() ; 
+//    FastLED.show() ; 
 //   //clear dancer 2 here 
 
 
@@ -474,16 +477,16 @@
 //   //tak 
 //   //lekin jayoonga dhil mera...
 //   //dancer3 on ; 
-//   // fill_solid(leds , NUM_LEDS , CRGB::Green) ; 
-//   // FastLED.show() ; 
+//    fill_solid(leds , NUM_LEDS , CRGB::Green) ; 
+//    FastLED.show() ; 
 //   delay(3200) ;
 //   //clear dancer 3 here 
 
 
 //   //tak 
 //   //dancer 3 on ; 
-//   // fill_solid(leds , NUM_LEDS , CRGB::Red) ; 
-//   // FastLED.show() ; 
+//    fill_solid(leds , NUM_LEDS , CRGB::Blue) ; 
+//    FastLED.show() ; 
 //   delay(700) ;
 //   //clear dancer 3 
 

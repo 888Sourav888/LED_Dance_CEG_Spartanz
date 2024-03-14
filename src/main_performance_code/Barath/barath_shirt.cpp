@@ -450,7 +450,8 @@
 //   fill_solid(leds , NUM_LEDS , CRGB::Blue) ; 
 //   FastLED.show() ; 
 //   delay(500) ; 
-//   // FastLED.clear() ; 
+//    FastLED.clear() ; 
+//    FastLED.show() ; 
 //   //clear dancer 2 here 
 
 
@@ -468,16 +469,16 @@
 //   //tak 
 //   //lekin jayoonga dhil mera...
 //   //dancer3 on ; 
-//   // fill_solid(leds , NUM_LEDS , CRGB::Green) ; 
-//   // FastLED.show() ; 
+//    fill_solid(leds , NUM_LEDS , CRGB::Green) ; 
+//    FastLED.show() ; 
 //   delay(3200) ;
 //   //clear dancer 3 here 
 
 
 //   //tak 
 //   //dancer 3 on ; 
-//   // fill_solid(leds , NUM_LEDS , CRGB::Blue) ; 
-//   // FastLED.show() ; 
+//    fill_solid(leds , NUM_LEDS , CRGB::Blue) ; 
+//    FastLED.show() ; 
 //   delay(700) ;
 //   //clear dancer 3 
 
@@ -519,13 +520,13 @@
 // //thooka muse chahaas mila  , oh eh ho 
 // // need data sheet for barath to do this 
 //   int startLED1 =  31 ,  endLED1 = 91 ; 
-// //   int startLED2  = 93 , endLED2 = 99 ; 
+// //   int startLED2  = 92 , endLED2 = 154 ; 
 // //   int startLED3 = 100 , endLED3 = 105;
 // //   int startLED4 = 165  , endLED4 = 245 ;   
 //   fill_solid(&leds[startLED1], endLED1 - startLED1 + 1, CRGB::Orange);
 //   FastLED.show()  ;
-// //   fill_solid(&leds[startLED2], endLED2 - startLED2 + 1, CRGB::Orange);
-// //   FastLED.show() ; 
+//  fill_solid(&leds[startLED2], endLED2 - startLED2 + 1, CRGB::Orange);
+// FastLED.show() ; 
 // //   fill_solid(&leds[startLED3], endLED3 - startLED3 + 1, CRGB::Orange);
 // //   FastLED.show() ; 
 // //   fill_solid(&leds[startLED4], endLED4 - startLED4 + 1, CRGB::Orange);  

@@ -727,7 +727,7 @@
     
 //     delay(20000) ; 
 //     FastLED.clear() ; 
-//     delay(100) ; 
+//     delay(100) ;  
 
 //   }
   
